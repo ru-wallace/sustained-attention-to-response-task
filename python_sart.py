@@ -39,20 +39,24 @@ brain injured and normal subjects. Neuropsychologia, 35(6), 747-758.
 Self-Contained Functions (Argument=Default Value):
 
 sart(monitor="testMonitor", blocks=1, reps=5, omitNum=3, practice=True, 
-     path="", fixed=False)
+     path="", fixed=False, selectOutputFile=False)
      
-monitor......The monitor to be used for the task.
-blocks.......The number of blocks to be presented.
-reps.........The number of repetitions to be presented per block.  Each
-             repetition equals 45 trials (5 font sizes X 9 numbers).
-omitNum......The number participants should withhold pressing a key on.
-practice.....If the task should display 18 practice trials that contain 
-             feedback on accuracy.
-path.........The directory in which the output file will be placed. Defaults
-             to the directory in which the task is placed.
-fixed........Whether or not the numbers should be presented in a fixed
-             instead of random order (e.g., 1, 2, 3, 4, 5, 6, 7, 8 ,9,
-             1, 2, 3, 4, 5, 6, 7, 8, 9...).     
+monitor.............The monitor to be used for the task.
+blocks..............The number of blocks to be presented.
+reps................The number of repetitions to be presented per block.  Each
+                    repetition equals 45 trials (5 font sizes X 9 numbers).
+omitNum.............The number participants should withhold pressing a key on.
+practice............If the task should display 18 practice trials that contain 
+                    feedback on accuracy.
+path................The directory in which the output file will be placed. Defaults
+                    to the directory in which the task is placed.
+fixed...............Whether or not the numbers should be presented in a fixed
+                    instead of random order (e.g., 1, 2, 3, 4, 5, 6, 7, 8 ,9,
+                    1, 2, 3, 4, 5, 6, 7, 8, 9...).
+selectOutputFile....If True, a dialog box will appear to allow the user to
+                    select the output file name and location.
+format="txt"........The format of the output file. Can be "txt" or "csv". Default
+                    is "txt".
              
 ################################### CITATION ##################################
 
@@ -91,79 +95,82 @@ SOFTWARE.
 """
 
 import time
-import copy
 import random
+import pathlib
 import sys 
 from psychopy import visual, core, data, event, gui
 
-def write_to_file(fileName, *data):
-    with open(fileName, "w") as f:
-            f.write("\t".join([str(x) for x in data]) + "\n")
 
 
-def sart(monitor="testMonitor", blocks=1, reps=5, omitNum=3, practice=True, 
-         path="", fixed=False):
-    """ SART Task.
-    
-    monitor......The monitor to be used for the task.
-    blocks.......The number of blocks to be presented.
-    reps.........The number of repetitions to be presented per block.  Each
-                 repetition equals 45 trials (5 font sizes X 9 numbers).
-    omitNum......The number participants should withold pressing a key on.
-    practice.....If the task should display 18 practice trials that contain 
-                 feedback on accuracy.
-    path.........The directory in which the output file will be placed. Defaults
-                 to the directory in which the task is placed.
-    fixed........Whether or not the numbers should be presented in a fixed
-                 instead of random order (e.g., 1, 2, 3, 4, 5, 6, 7, 8 ,9,
-                 1, 2, 3, 4, 5, 6, 7, 8, 9...).
-    """
+
+def sart(monitor="testMonitor", blocks:int=1, reps:int=5, omitNum:int=3, practice:bool=True, 
+                  path:str="output", fixed:bool=False, selectOutputFile:bool=False, format:str=".txt", delimiter:str="\t"):
+    """SART Task.
+
+
+    Parameters:
+        monitor (str): The monitor to be used for the task.
+        blocks (int): The number of blocks to be presented.
+        reps (int): The number of repetitions to be presented per block. Each
+        omitNum (int): The number participants should withhold pressing a key on.
+        practice (bool): If the task should display 18 practice trials that contain 
+        path (str): The directory in which the output file will be placed. Defaults
+        fixed (bool): Whether or not the numbers should be presented in a fixed
+                        instead of random order (e.g., 1, 2, 3, 4, 5, 6, 7, 8, 9,
+        selectOutputFile (bool): If True, a dialog box will appear to allow the user to
+                        select the output file name and location.   
+        format (str): The format of the output file. Can be "txt" or "csv".
+
+    Returns:
+        None
+        """
+
     partInfo = part_info_gui()
-    fileName = "SART_" + str(partInfo[0]) + ".txt"
-    file = gui.fileSaveDlg(prompt="Save Data File As", allowed="*.txt", initFileName=fileName)
+    fileName = "SART_" + str(partInfo[0]) + format
+    if selectOutputFile:
+        fileName = select_output_file(path, fileName)
 
-    if file is not None:
-        fileName = file
-
+    write_to_file(fileName, delimiter, 
+                "part_num", "part_gender", "part_age", "part_school_yr",
+                "part_normal_vision", "exp_initials", "block_num",
+                "trial_num", "number", "omit_num", "resp_acc", "resp_rt",
+                "trial_start_time_s", "trial_end_time_s", "mean_trial_time_s",
+                "timing_function")
     mainResultList = []
     
-    win = visual.Window(fullscr=True, color="black", units='cm',
+    win = visual.Window(size=(1920,1080),fullscr=True, color="black", units='cm',
                         monitor=monitor)
     sart_init_inst(win, omitNum)
     if practice == True:
+        practiceResultList = []
         sart_prac_inst(win, omitNum)
-        mainResultList.extend(sart_block(win, fb=True, omitNum=omitNum, 
+        practiceResultList.extend(sart_block(win, fb=True, omitNum=omitNum, 
                               reps=1, bNum=0, fixed=fixed))
+        for line in practiceResultList:
+            write_to_file(fileName, delimiter, *partInfo, *line)
     sart_act_task_inst(win)
     for block in range(1, blocks + 1):
         mainResultList.extend(sart_block(win, fb=False, omitNum=omitNum,
                               reps=reps, bNum=block, fixed=fixed))
         if (blocks > 1) and (block != blocks):
             sart_break_inst(win)
-    write_to_file(fileName, 
-                    "part_num", "part_gender", "part_age", "part_school_yr",
-                    "part_normal_vision", "exp_initials", "block_num",
-                    "trial_num", "number", "omit_num", "resp_acc", "resp_rt",
-                    "trial_start_time_s", "trial_end_time_s", "mean_trial_time_s",
-                    "timing_function")
+
     print(mainResultList)
     for line in mainResultList:
-        write_to_file(fileName, *partInfo)
-        write_to_file(fileName, *line)
-        #fileName.write("time.time()\n")
+        write_to_file(fileName, delimiter, *partInfo, *line)
     #fileName.close()
     
 def part_info_gui():
     
     info = gui.Dlg(title='SART')
     info.addText('Participant Info')
-    info.addField('Part. Number: ')
-    info.addField('Part. Gender: ', 
+    info.addField('Participant Number: ')
+    info.addField('Gender: ', 
                   choices=["Please Select", "Male", "Female", "Other"])
-    info.addField('Part. Age:  ')
-    info.addField('Part. Year in School: ', 
-                  choices=["Please Select", "Freshman", "Sophmore", "Junior", 
-                           "Senior", "1st Year Graduate Student", 
+    info.addField('Age:  ')
+    info.addField('Year in School: ', 
+                  choices=["Please Select", "1st Year", "2nd Year", "3rd Year", 
+                           "4th Year", "1st Year Graduate Student",
                            "2nd Year Graduate Student", 
                            "3rd Year Graduate Student", 
                            "4th Year Graduate Student",
@@ -171,6 +178,7 @@ def part_info_gui():
                            "6th Year Graduate Student"])
     info.addField('Do you have normal or corrected-to-normal vision?', 
                   choices=["Please Select", "Yes", "No"])
+    info.addText('')
     info.addText('Experimenter Info')
     info.addField('DIS Initials:  ')
     info.show()
@@ -348,10 +356,30 @@ def sart_trial(win, fb, omitNum, xStim, circleStim, numStim, correctStim,
     return [str(bNum), str(tNum), str(number), str(omitNum), str(respAcc),
             str(respRt), str(startTime), str(endTime)]
 
+def write_to_file(fileName, delimiter:str, *data):
+    with open(fileName, "a") as f:
+            f.write("\t".join([str(x) for x in data]) + "\n")
+
+def select_output_file(path, fileName:str):
+    # Get the file name and path using a dialog box
+    # If the file already exists, add a number to the end of the file name
+    file = gui.fileSaveDlg(prompt="Save Data File As", allowed="Text Files (*.txt)|*.txt|CSV Files (*.csv)|*.csv", initFileName=fileName, initFilePath=path)
+
+    if file is not None and file != "":
+        fileName = file
+
+    file_stem, extension = fileName.rsplit(".", 1)
+
+    attempts = 0
+    while pathlib.Path(fileName).exists():
+        attempts += 1
+        fileName = file_stem + f"_{attempts}." + extension
+
+    return fileName
 
 
 def main():
-    sart()
+    sart(selectOutputFile=True, format=".csv", delimiter=",")
 
 if __name__ == "__main__":
     main()
