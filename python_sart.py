@@ -102,7 +102,6 @@ from psychopy import visual, core, data, event, gui
 
 
 
-
 def sart(monitor="testMonitor", blocks:int=1, reps:int=5, omitNum:int=3, practice:bool=True, 
                   path:str="output", fixed:bool=False, selectOutputFile:bool=False, format:str=".txt", delimiter:str="\t"):
     """SART Task.
@@ -110,23 +109,22 @@ def sart(monitor="testMonitor", blocks:int=1, reps:int=5, omitNum:int=3, practic
 
     Parameters:
         monitor (str): The monitor to be used for the task.
-        blocks (int): The number of blocks to be presented.
-        reps (int): The number of repetitions to be presented per block. Each
+        blocks (int): The number of blocks to be presented. A 60 second break will be given between each block.
+        reps (int): The number of repetitions to be presented per block. Each repetition equals 45 trials (5 font sizes X 9 numbers).
         omitNum (int): The number participants should withhold pressing a key on.
-        practice (bool): If the task should display 18 practice trials that contain 
-        path (str): The directory in which the output file will be placed. Defaults
-        fixed (bool): Whether or not the numbers should be presented in a fixed
-                        instead of random order (e.g., 1, 2, 3, 4, 5, 6, 7, 8, 9,
-        selectOutputFile (bool): If True, a dialog box will appear to allow the user to
-                        select the output file name and location.   
-        format (str): The format of the output file. Can be "txt" or "csv".
+        practice (bool): If the task should display 18 practice trials that contain feedback on accuracy.
+        path (str): The directory in which the output file will be placed. Defaults to the directory in which the task is placed with a subdirectory called "output".
+        fixed (bool): Whether or not the numbers should be presented in a fixed instead of random order (e.g., 1, 2, 3, 4, 5, 6, 7, 8, 9,...).
+        selectOutputFile (bool): If True, a dialog box will appear to allow the user to select the output file name and location.   
+        format (str): The format of the output file. Can be ".txt" or ".csv".
+        delimiter (str): The delimiter to use in the output file. Default is tab specificied by "\\t".
 
     Returns:
         None
         """
 
     partInfo = part_info_gui()
-    fileName = "SART_" + str(partInfo[0]) + format
+    fileName = "SART_" + str(partInfo['part_num']) + "." + format.strip(".")
     if selectOutputFile:
         fileName = select_output_file(path, fileName)
 
@@ -148,8 +146,7 @@ def sart(monitor="testMonitor", blocks:int=1, reps:int=5, omitNum:int=3, practic
         sart_prac_inst(win, omitNum)
         practiceResultList.extend(sart_block(win, fb=True, omitNum=omitNum, 
                               reps=1, bNum=0, fixed=fixed))
-        for line in practiceResultList:
-            write_to_file(fileName, delimiter, *partInfo, *line)
+        write_results_to_file(fileName, partInfo, practiceResultList, delimiter=delimiter)
     sart_act_task_inst(win)
     for block in range(1, blocks + 1):
         mainResultList.extend(sart_block(win, fb=False, omitNum=omitNum,
@@ -157,13 +154,10 @@ def sart(monitor="testMonitor", blocks:int=1, reps:int=5, omitNum:int=3, practic
         if (blocks > 1) and (block != blocks):
             sart_break_inst(win)
 
-    print(mainResultList)
-    for line in mainResultList:
-        write_to_file(fileName, delimiter, *partInfo, *line)
+    write_results_to_file(fileName, partInfo, mainResultList, delimiter=delimiter, timing_function="time.time()")
     #fileName.close()
     
 def part_info_gui():
-    
     info = gui.Dlg(title='SART')
     info.addText('Participant Info')
     info.addField('Participant Number: ')
@@ -171,7 +165,7 @@ def part_info_gui():
                   choices=["Please Select", "Male", "Female", "Other"])
     info.addField('Age:  ')
     info.addField('Year in School: ', 
-                  choices=["Please Select", "1st Year", "2nd Year", "3rd Year", 
+                  choices=["Please Select", "N/A", "1st Year", "2nd Year", "3rd Year", 
                            "4th Year", "1st Year Graduate Student",
                            "2nd Year Graduate Student", 
                            "3rd Year Graduate Student", 
@@ -184,11 +178,26 @@ def part_info_gui():
     info.addText('Experimenter Info')
     info.addField('DIS Initials:  ')
     info.show()
+
+    
+
     if info.OK:
         infoData = info.data
+
+        part_data = {
+            "part_num": infoData[0],
+            "gender": infoData[1],
+            "age": infoData[2],
+            "school_yr": infoData[3],
+            "normal_vision": infoData[4],
+            "exp_initials": infoData[5]
+        }
+
+        return part_data
     else:
+        print("User cancelled the dialog.")
         sys.exit()
-    return infoData
+    
     
 def sart_init_inst(win, omitNum):
     inst = visual.TextStim(win, text=("In this task, a series of numbers will" +
@@ -208,9 +217,12 @@ def sart_init_inst(win, omitNum):
                                       " are ready to start."), 
                            color="white", height=0.7, pos=(0, 0))
     event.clearEvents()
-    while 'b' not in event.getKeys():
+    while 'b' not in event.getKeys(['b']):
         inst.draw()
         win.flip()
+        if 'q' in event.getKeys(['q']):
+            core.quit()
+            sys.exit()
         
 def sart_prac_inst(win, omitNum):
     inst = visual.TextStim(win, text=("We will now do some practice trials " +
@@ -222,9 +234,12 @@ def sart_prac_inst(win, omitNum):
                                       "practice."), 
                            color="white", height=0.7, pos=(0, 0))
     event.clearEvents()
-    while 'b' not in event.getKeys():
+    while 'b' not in event.getKeys(['b']):
         inst.draw()
         win.flip()
+        if 'q' in event.getKeys(['q']):
+            core.quit()
+            sys.exit()
         
 def sart_act_task_inst(win):
     inst = visual.TextStim(win, text=("We will now start the actual task.\n" +
@@ -234,9 +249,12 @@ def sart_act_task_inst(win):
                                       "start the actual task."), 
                            color="white", height=0.7, pos=(0, 0))
     event.clearEvents()
-    while 'b' not in event.getKeys():
+    while 'b' not in event.getKeys(['b']):
         inst.draw()
         win.flip()
+        if 'q' in event.getKeys(['q']):
+            core.quit()
+            sys.exit()
         
 def sart_break_inst(win):
         inst = visual.TextStim(win, text=("You will now have a 60 second " +
@@ -255,9 +273,13 @@ def sart_break_inst(win):
             if eTime > 60:
                 break
         event.clearEvents()
-        while 'b' not in event.getKeys():
-            nbInst.draw()
+        
+        while 'b' not in event.getKeys(['b']):
+            inst.draw()
             win.flip()
+            if 'q' in event.getKeys(['q']):
+                core.quit()
+                sys.exit()
 
 def sart_block(win, fb, omitNum, reps, bNum, fixed):
     mouse = event.Mouse(visible=0)
@@ -275,20 +297,20 @@ def sart_block(win, fb, omitNum, reps, bNum, fixed):
         fontSizes=[1.20, 3.00]
     else:
         fontSizes=[1.20, 1.80, 2.35, 2.50, 3.00]
-    list= data.createFactorialTrialList({"number" : numbers,
+    trial_list= data.createFactorialTrialList({"number" : numbers,
                                          "fontSize" : fontSizes})
     seqList = []
     for i in range(len(fontSizes)):
         for number in numbers:
-            random.shuffle(list)
-            for trial in list:
+            random.shuffle(trial_list)
+            for trial in trial_list:
                 if trial["number"] == number and trial not in seqList:
                     seqList.append(trial)
                     break
     if fixed == True:
         trials = data.TrialHandler(seqList, nReps=reps, method='sequential')
     else:
-        trials = data.TrialHandler(list, nReps=reps, method='random')
+        trials = data.TrialHandler(trial_list, nReps=reps, method='random')
     clock = core.Clock()
     tNum = 0
     resultList =[]
@@ -303,14 +325,14 @@ def sart_block(win, fb, omitNum, reps, bNum, fixed):
     totalTime = endTime - startTime
     for row in resultList:
         row.append(totalTime/tNum)
-    print ("\n\n#### Block " + str(bNum) + " ####\nDes. Time Per P Trial: " +
-           str(2.05*1000) + " ms\nDes. Time Per Non-P Trial: " +
-           str(1.15*1000) + " ms\nActual Time Per Trial: " +
-           str((totalTime/tNum)*1000) + " ms\n\n")
+    print(f"\n\n#### Block {bNum} ####")
+    print(f"Des. Time Per P Trial: {2.05*1000} ms")
+    print(f"Des. Time Per Non-P Trial: {1.15*1000} ms")
+    print(f"Actual Time Per Trial: {(totalTime/tNum)*1000} ms\n\n")
     return resultList
     
-def sart_trial(win, fb, omitNum, xStim, circleStim, numStim, correctStim, 
-               incorrectStim, clock, fontSize, number, tNum, bNum, mouse):
+def sart_trial(win:visual.Window, fb:bool, omitNum:int, xStim:visual.TextStim, circleStim:visual.Circle, numStim:visual.TextStim, correctStim:visual.TextStim, 
+               incorrectStim:visual.TextStim, clock:core.Clock, fontSize:float, number:int, tNum:int, bNum:int, mouse:event.Mouse):
     startTime = time.time()
     mouse.setVisible(0)
     respRt = "NA"
@@ -332,6 +354,10 @@ def sart_trial(win, fb, omitNum, xStim, circleStim, numStim, correctStim,
     win.flip()
     allKeys = event.getKeys(timeStamped=clock)
     if len(allKeys) != 0:
+        # Check if the participant pressed the quit key (q)
+        if allKeys[0][0] == 'q':
+            core.quit()
+            sys.exit()
         respRt = allKeys[0][1]
     if len(allKeys) == 0:
         if omitNum == number:
@@ -358,9 +384,22 @@ def sart_trial(win, fb, omitNum, xStim, circleStim, numStim, correctStim,
     return [str(bNum), str(tNum), str(number), str(omitNum), str(respAcc),
             str(respRt), str(startTime), str(endTime)]
 
+
+
 def write_to_file(fileName, delimiter:str, *data):
     with open(fileName, "a") as f:
-            f.write("\t".join([str(x) for x in data]) + "\n")
+            f.write(delimiter.join([str(x) for x in data]) + "\n")
+
+def write_results_to_file(fileName:str, partInfo:dict, resultList:list=None, headers:list[str]=None, delimiter:str="\t", timing_function:str="time.time()"):
+    if headers is not None:
+        write_to_file(fileName, delimiter, *headers)
+
+    participantInfo = delimiter.join([str(x) for x in [partInfo['part_num'], partInfo['gender'], partInfo['age'], partInfo['school_yr'], partInfo['normal_vision'], partInfo['exp_initials']]])
+    for line in resultList:
+        write_to_file(fileName, delimiter, participantInfo, *line, timing_function)
+    
+
+
 
 def select_output_file(path, fileName:str):
     # Get the file name and path using a dialog box
