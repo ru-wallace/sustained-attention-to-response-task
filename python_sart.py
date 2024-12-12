@@ -130,6 +130,8 @@ def sart(monitor="testMonitor", blocks:int=1, reps:int=5, omitNum:int=3, practic
     if selectOutputFile:
         fileName = select_output_file(path, fileName)
 
+    pathlib.Path(fileName).parent.mkdir(parents=True, exist_ok=True)
+
     write_to_file(fileName, delimiter, 
                 "part_num", "part_gender", "part_age", "part_school_yr",
                 "part_normal_vision", "exp_initials", "block_num",
