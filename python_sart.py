@@ -424,3 +424,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#TODO: Output if entries are part of practice run
+#TODO: Add option for feedback on normal trials
