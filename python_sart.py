@@ -93,8 +93,13 @@ SOFTWARE.
 import time
 import copy
 import random
-
+import sys 
 from psychopy import visual, core, data, event, gui
+
+def write_to_file(fileName, *data):
+    with open(fileName, "w") as f:
+            f.write("\t".join([str(x) for x in data]) + "\n")
+
 
 def sart(monitor="testMonitor", blocks=1, reps=5, omitNum=3, practice=True, 
          path="", fixed=False):
@@ -114,9 +119,14 @@ def sart(monitor="testMonitor", blocks=1, reps=5, omitNum=3, practice=True,
                  1, 2, 3, 4, 5, 6, 7, 8, 9...).
     """
     partInfo = part_info_gui()
-    mainResultList = []
     fileName = "SART_" + str(partInfo[0]) + ".txt"
-    outFile = open(path + fileName, "w")
+    file = gui.fileSaveDlg(prompt="Save Data File As", allowed="*.txt", initFileName=fileName)
+
+    if file is not None:
+        fileName = file
+
+    mainResultList = []
+    
     win = visual.Window(fullscr=True, color="black", units='cm',
                         monitor=monitor)
     sart_init_inst(win, omitNum)
@@ -130,19 +140,21 @@ def sart(monitor="testMonitor", blocks=1, reps=5, omitNum=3, practice=True,
                               reps=reps, bNum=block, fixed=fixed))
         if (blocks > 1) and (block != blocks):
             sart_break_inst(win)
-    outFile.write("part_num\tpart_gender\tpart_age\tpart_school_yr\t" +
-                  "part_normal_vision\texp_initials\tblock_num\ttrial_num\t" +
-                  "number\tomit_num\tresp_acc\tresp_rt\ttrial_start_time_s" +
-                  "\ttrial_end_time_s\tmean_trial_time_s\ttiming_function\n")
+    write_to_file(fileName, 
+                    "part_num", "part_gender", "part_age", "part_school_yr",
+                    "part_normal_vision", "exp_initials", "block_num",
+                    "trial_num", "number", "omit_num", "resp_acc", "resp_rt",
+                    "trial_start_time_s", "trial_end_time_s", "mean_trial_time_s",
+                    "timing_function")
+    print(mainResultList)
     for line in mainResultList:
-        for item in partInfo:
-            outFile.write(str(item) + "\t")
-        for col in line:
-            outFile.write(str(col) + "\t")
-        outFile.write("time.clock()\n")
-    outFile.close()
+        write_to_file(fileName, *partInfo)
+        write_to_file(fileName, *line)
+        #fileName.write("time.time()\n")
+    #fileName.close()
     
 def part_info_gui():
+    
     info = gui.Dlg(title='SART')
     info.addText('Participant Info')
     info.addField('Part. Number: ')
@@ -225,9 +237,9 @@ def sart_break_inst(win):
                                             " trials.\n\nPress the b key " +
                                             "bar to begin."),
                                  color="white", height=0.7, pos=(0, 0))
-        startTime = time.clock()
+        startTime = time.time()
         while 1:
-            eTime = time.clock() - startTime
+            eTime = time.time() - startTime
             inst.draw()
             win.flip()
             if eTime > 60:
@@ -270,14 +282,14 @@ def sart_block(win, fb, omitNum, reps, bNum, fixed):
     clock = core.Clock()
     tNum = 0
     resultList =[]
-    startTime = time.clock()
+    startTime = time.time()
     for trial in trials:
         tNum += 1
         resultList.append(sart_trial(win, fb, omitNum, xStim, circleStim,
                               numStim, correctStim, incorrectStim, clock, 
                               trials.thisTrial['fontSize'], 
                               trials.thisTrial['number'], tNum, bNum, mouse))
-    endTime = time.clock()
+    endTime = time.time()
     totalTime = endTime - startTime
     for row in resultList:
         row.append(totalTime/tNum)
@@ -289,7 +301,7 @@ def sart_block(win, fb, omitNum, reps, bNum, fixed):
     
 def sart_trial(win, fb, omitNum, xStim, circleStim, numStim, correctStim, 
                incorrectStim, clock, fontSize, number, tNum, bNum, mouse):
-    startTime = time.clock()
+    startTime = time.time()
     mouse.setVisible(0)
     respRt = "NA"
     numStim.setHeight(fontSize)
@@ -297,15 +309,15 @@ def sart_trial(win, fb, omitNum, xStim, circleStim, numStim, correctStim,
     numStim.draw()
     event.clearEvents()
     clock.reset()
-    stimStartTime = time.clock()
+    stimStartTime = time.time()
     win.flip()
     xStim.draw()
     circleStim.draw()
-    waitTime = .25 - (time.clock() - stimStartTime)
+    waitTime = .25 - (time.time() - stimStartTime)
     core.wait(waitTime, hogCPUperiod=waitTime)
-    maskStartTime = time.clock()
+    maskStartTime = time.time()
     win.flip()
-    waitTime = .90 - (time.clock() - maskStartTime)
+    waitTime = .90 - (time.time() - maskStartTime)
     core.wait(waitTime, hogCPUperiod=waitTime)
     win.flip()
     allKeys = event.getKeys(timeStamped=clock)
@@ -326,15 +338,17 @@ def sart_trial(win, fb, omitNum, xStim, circleStim, numStim, correctStim,
             incorrectStim.draw()
         else:
             correctStim.draw()
-        stimStartTime = time.clock()
+        stimStartTime = time.time()
         win.flip()
-        waitTime = .90 - (time.clock() - stimStartTime) 
+        waitTime = .90 - (time.time() - stimStartTime) 
         core.wait(waitTime, hogCPUperiod=waitTime)
         win.flip()
-    endTime = time.clock()
+    endTime = time.time()
     totalTime = endTime - startTime
     return [str(bNum), str(tNum), str(number), str(omitNum), str(respAcc),
             str(respRt), str(startTime), str(endTime)]
+
+
 
 def main():
     sart()
