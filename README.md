@@ -8,6 +8,10 @@ A Python version of the Sustained Attention to Response Task (SART) as detailed 
 
 ![SART task flow](/python-sustained-attention-to-response-task-sart.png?raw=true "SART Task Flow")
 
+Originally created by [Cary Stothart](https://github.com/cstothart), forked by [Ru Wallace](https://github.com/ru-wallace)
+
+Modified significantly from the [original version](https://github.com/cstothart/sustained-attention-to-response-task) to work with more recent releases of Python and PsychoPy. An earlier iteration much closer to the original code can be found [here](python_sart_old.py).
+
 ### How to Use
 
 1. Install PsychoPy if you haven't already.
@@ -55,28 +59,36 @@ function documentation below for details):
 4) The presentation order of the numbers. Specifically, the
    numbers can be presented randomly or in a fixed fashion. (default is random)
 5) Whether or not practice trials should be presented at the beginning of the task.
-6) path: The directory in which the output file will be placed. Defaults to a subfolder named 'output' in the directory in which the task is placed.
-7) selectOutputFile: If True, a dialog box will appear after entering participant details to allow the user to select the output file name and location. If False, the output file will be saved to the path specified in the path parameter.
-8) format: The default file format of the output file. Can be ".txt" or ".csv". Default is ".txt".
-9) delimiter: The delimiter to use in the output file. Default is tab specified by "\t".
+6) The default directory in which the output file will be placed. Defaults to a subfolder named 'output' in the directory in which the task is placed.
+
 
 ### Function Details
 
-Self-Contained Functions (Argument=Default Value):
+To run a SART experiment, create an instance of the SART class with the desired parameters and call the run() method. The SART class has the following parameters:
 
-sart(monitor="testMonitor", blocks=1, reps=5, omitNum=3, practice=True,
-     path="", fixed=False)
+- **blocks** (int): The number of blocks to be presented.
+- **reps** (int): The number of repetitions to be presented per block.  Each  repetition equals 45 trials (5 font sizes X 9 numbers).
+- **omitted_num** (int): The number on which participants should withhold pressing a key. If not specified, a random number will be chosen between 1 and 9.
+- **show_practice** (bool): If the task should display 18 practice trials that contain feedback on accuracy before the main task (default is True).
+- **break_between_blocks_secs** (float): The number of seconds to wait between blocks (default is 60s).
+- **stimulus_visible_secs** (float): The number of seconds the stimulus is visible (default is 0.90s).
+- **stimulus_masked_secs** (float): The number of seconds the stimulus is masked (default is 0.25s).
+- **output_dir** (str): The  default directory in which the save file dialog will open. If not specified, the save file dialog will open in the current working directory.
+- **fixed_order** (bool): Whether or not the numbers should be presented in a fixed instead of random order (e.g., 1, 2, 3, 4, 5, 6, 7, 8 ,9, 1, 2, 3, 4, 5, 6, 7, 8, 9,...).
+- **monitor** (str): The monitor to be used for the task. (default is "testMonitor", the PsychoPy default monitor)
+- **exit_key** (str): The key that will exit the task. (default is 'escape')
 
-* **monitor** (str): The monitor to be used for the task.
-* **blocks** (int): The number of blocks to be presented.
-* **reps** (int): The number of repetitions to be presented per block.  Each  repetition equals 45 trials (5 font sizes X 9 numbers).
-* **omitNum** (int): The number participants should withhold pressing a key on.
-* **practice** (bool): If the task should display 18 practice trials that contain feedback on accuracy.
-* **path** (str): The directory in which the output file will be placed. Defaults to a subfolder named 'output' in the directory in which the task is placed.
-* **fixed** (bool): Whether or not the numbers should be presented in a fixed instead of random order (e.g., 1, 2, 3, 4, 5, 6, 7, 8 ,9, 1, 2, 3, 4, 5, 6, 7, 8, 9,...).
-* **selectOutputFile** (bool): If True, a dialog box will appear after entering participant details to allow the user to select the output file name and location. If False, the output file will be saved to the path specified in the path parameter.
-* **format** (str): The default file format of the output file. Can be ".txt" or ".csv". Default is ".txt".
-* **delimiter** (str): The delimiter to use in the output file. Default is tab specified by "\t".
+For example, to run a SART task with 2 blocks, 3 repetitions per block, and a target number of 4, you would use the following code:
+
+```python
+from python_sart import SART
+
+sart = SART(blocks=2, reps=3, omitted_num=4)
+sart.run()
+```
+
+The run() method will open a dialogue to enter the participant details, then prompt you to select a directory to save the output file.
+Once these details are entered, the task will begin.
 
 ### Reference
 
@@ -85,11 +97,9 @@ Robertson, H., Manly, T., Andrade, J.,  Baddeley, B. T., & Yiend, J. (1997).
 
 ### Fork Notes
 
-I forked this repository to make a few changes to the original code. I updated some of the code to work with more recent releases of Python and PsychoPy. I also added a few more parameters to the sart() function to allow for more customization of the task.
+I forked this repository to make a few changes to the original code. I updated some of the code to work with more recent releases of Python and PsychoPy. I also added a few more parameters to allow for more customization of the task.
 
-* The user can specify whether a manual file selection dialog should be used to select the output directory. If the user does not want to use the dialog, the user can specify the output directory in the path parameter.
-
-* The user can also specify whether the filename shouild have a txt extension or a csv extension. The user can also specify the filename.
-
-* The user can also specify the delimiter for the output file. The default delimiter is a tab, specified by '\t'.
-  
+- The participant information section is updated with changed fields for stage of study (aligned to UK terminology). The dialog now has required sections, will not allow the user to proceed without filling in the required fields, and will not allow the user to proceed if the participant ID and ages are not a number. The gender field is still an option dropdown menu, but the user can also type in a custom answer if they wish.
+- The output file is now saved as an Excel file (.xlsx) instead of a CSV file. There are fewer columns in the output file, and the columns are now named with more descriptive titles.
+- The output file now includes a column in which the average of the previous 4 reaction times is calculated for each trial in which the participant should have withheld a response. 
+  If any of these 4 trials was also one in which they should have withheld a response, or one in which the participant did not respond, the average is not calculated and the cell is left blank.
