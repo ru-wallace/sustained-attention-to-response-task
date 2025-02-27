@@ -6,7 +6,7 @@ A Python version of the Sustained Attention to Response Task (SART) as detailed 
 
 Originally created by [Cary Stothart](https://github.com/cstothart), forked by [Ru Wallace](https://github.com/ru-wallace)
 
-Modified significantly from the [original version](https://github.com/cstothart/sustained-attention-to-response-task) to work with more recent releases of Python and PsychoPy. An earlier iteration much closer to the original code can be found [here](python_sart_old.py).
+Modified significantly from the [original version](https://github.com/cstothart/sustained-attention-to-response-task) to work with more recent releases of Python and PsychoPy. An earlier iteration much closer to the original code is included in this repository [here](python_sart_old.py).
 
 ## How to Use
 
@@ -14,7 +14,7 @@ Modified significantly from the [original version](https://github.com/cstothart/
 2. Download the [python_sart.py](python_sart.py) file from this repository and save it to a desired location on your computer.
 3. Open the PsychoPy application, and if you are not already in the Coder view, open it by clicking on the Coder icon in the top right corner of the PsychoPy window or by selecting "Window" -> "Show Coder" from the top menu bar.
 4. Load the python_sart.py file into the PsychoPy Coder view by clicking on "File" -> "Open" in the top menu bar and navigating to the location of the python_sart.py file.
-5. Create a second python script in the same folder as the python_sart.py file (Select "File" -> "New" from the top menu bar). This script will be used to run the SART task with your choice of customisation parameters. The file [template_sart_script.py](template_sart_script.py) contains a template script that can be used to run the SART task. You can copy the contents of this file and modify the parameters as needed.
+5. Create a second python script in the same folder as the python_sart.py file (Select "File" -> "New" from the top menu bar). This script will be used to run the SART task with your choice of customisation parameters. The file [template_sart_script.py](template_sart_script.py) contains a template script that can be used for this purpose to run the SART task. You can copy the contents of this file and modify the parameters as needed.
 6. Run the script by clicking on the green "Run" button in the "Desktop" section of the toolbar at the top of the PsychoPy window.
 7. Participants will be run on the classic SART task (Robertson et al, 1997) unless one of the sart() function parameters is changed.
 8. If you want to make this process easier, you can save the script as part of a task list:
@@ -26,22 +26,18 @@ Modified significantly from the [original version](https://github.com/cstothart/
 
 ### Note for manual PsychoPy installation using pip or conda (Ignore if using the standalone PsychoPy application)
 
-The max NumPy version that PsychoPy supports is 1.23.5. If you are installing PsychoPy manually using pip or conda, you may need to manually install an older version of NumPy. You can install the correct version of NumPy using the following command:
+The max Python version supported by the latest version of PsychoPy is Python 3.11. If you are using conda, you can install the correct version of Python using the following command:
 
 ```bash
-pip install numpy==1.23.5
+conda install python=3.11
 ```
 
-After installing the correct version of NumPy, you can install PsychoPy using the following command:
+After installing the correct version of Python, you can install PsychoPy using the following command:
+
+**Note:** Do not use the `conda install psychopy` command as it will install an older version of PsychoPy that is not compatible with the latest version of Python.
 
 ```bash
 pip install psychopy
-```
-
-For optimal performance of the GUI, install PyQt5 using the following command:
-
-```bash
-pip install pyqt5
 ```
 
 ## Task Details
@@ -49,13 +45,13 @@ pip install pyqt5
 The following task attributes can be easily modified (see the sart()
 function documentation below for details):
 
-1) Number of blocks (default is 1)
-2) Number of font size by number repetitions per trial (default is 5)
-3) Target number (default is 3)
-4) The presentation order of the numbers. Specifically, the
-   numbers can be presented randomly or in a fixed fashion. (default is random)
-5) Whether or not practice trials should be presented at the beginning of the task.
-6) The default directory in which the output file will be placed. Defaults to a subfolder named 'output' in the directory in which the task is placed.
+1) Number of blocks (*default is 1*)
+2) Number of font size by number repetitions per trial (*default is 5*)
+3) Target number (*default is 3*)
+4) The presentation order of the numbers. Specifically, the numbers can be presented randomly or in a fixed fashion. (*default is random*)
+5) Whether or not practice trials should be presented at the beginning of the task. (*default is True*)
+6) The number of seconds to wait between blocks. (*default is 60s*)
+7) The default directory in which the output file will be placed. Defaults to a subfolder named 'output' in the directory in which the task is placed.
 
 ## Function Details
 
