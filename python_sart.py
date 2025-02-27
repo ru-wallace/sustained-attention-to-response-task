@@ -341,7 +341,7 @@ class SART:
             #Reorder columns
             column_order = ['participant_number', 'gender', 'age', 'year_of_study', 'normal_vision', 'researcher_initials', 'experiment_completed', 'block', 'trial', 'number_to_omit', 'number_shown', 'response_correct', 'response_time', 'last_four_avg']
             self.results_df = self.results_df[column_order]
-            self.results_df.to_excel(self.output_file, freeze_panes=(1, 0))
+            self.results_df.to_excel(self.output_file, freeze_panes=(1, 0), index=False)
             print(f"Data saved to {self.output_file}")
             print("Number of trials completed: ", n_trials)
         if self.window is not None:
