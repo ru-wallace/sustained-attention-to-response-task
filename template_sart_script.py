@@ -37,3 +37,4 @@ fixed_order = False
 
 # Run the experiment
 sart = python_sart.SART(blocks=blocks, reps=reps, omit_number=number_to_omit, show_practice=practice, fixed_order=fixed_order)
+sart.run()
