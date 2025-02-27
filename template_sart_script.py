@@ -12,7 +12,7 @@ See the instructions at https://github.com/ru-wallace/sustained-attention-to-res
 
 
 
-import python_sart
+import python_sart_1
 
 ### Define the parameters for the experiment
 
@@ -23,30 +23,18 @@ blocks = 1
 # each combination of 5 font sizes and 9 numbers)
 reps = 5
 
+#The number at which the user should withhold input
+#If you set this to 'number_to_omit=None', a random number between 1 and 9 will be picked.
+#This number is recorded in the output file
+number_to_omit=3
+
 # If True, a practice block will be run before the main experiment
 practice = True
 
 # If True, the trial order will be fixed in sequence 
 # (1,2,...8,9,1,2,..,)
-fixed = False
-
-# If True, the user will be prompted to select the output 
-# file destination after entering participant details.
-selectOutputFile = True
-
-# Folder to save the output files (Will be created if it doesn't exist) 
-# (If selectOutputFile is true, this is used as the default 
-# path when opening the file dialog)
-path = 'output'
-
-# Default output file format (csv or txt) 
-# (If selectOutputFile is true, this can be changed when 
-# selecting the output file)
-format = 'csv'
-
-# Default delimiter for csv files (Separator between columns)
-delimiter = ','
-
+fixed_order = False
 
 # Run the experiment
-python_sart.sart(blocks=blocks, reps=reps, path=path, practice=practice, fixed=fixed, selectOutputFile=selectOutputFile, format=format, delimiter=delimiter)
+#python_sart.sart(blocks=blocks, reps=reps, path=path, practice=practice, fixed=fixed, selectOutputFile=selectOutputFile, format=format, delimiter=delimiter)
+sart = python_sart_1.SART(blocks=blocks, reps=reps, omit_number=number_to_omit, show_practice=practice, fixed_order=fixed_order)

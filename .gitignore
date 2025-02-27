@@ -1,5 +1,6 @@
 *.txt
 *.csv
+*.xlsx
 *.psyrun
 /__pycache__/
 *.pyc
