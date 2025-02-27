@@ -216,6 +216,7 @@ class SART:
                  break_between_blocks_secs:float=60.0,
                    stimulus_visible_secs:float=0.90, 
                    stimulus_masked_secs:float=0.25, 
+                   show_countdown:bool=False,
                    fixed_order:bool=False, 
                    output_dir:str="", 
                    monitor:str|None="testMonitor", 
@@ -230,6 +231,7 @@ class SART:
         break_between_blocks_secs (float): The duration of the break between blocks.
         stimulus_visible_secs (float): The duration for which the stimulus is visible.
         stimulus_masked_secs (float): The duration for which the stimulus is masked.
+        show_countdown (bool): If True, a countdown will be displayed 5 seconds before the start of a block (or less if the break is shorter).
         fixed_order (bool): If True, the trial order will be fixed in sequence.
         output_dir (str): The directory to save the output file.
         monitor (str): The monitor to use.
@@ -250,6 +252,10 @@ class SART:
         self.break_between_blocks_secs = break_between_blocks_secs
         self.stimulus_visible_secs = stimulus_visible_secs
         self.stimulus_masked_secs = stimulus_masked_secs
+        self.countdown = show_countdown
+        self.countdown_secs = min(5, self.break_between_blocks_secs)
+
+        self.break_between_blocks_secs = self.break_between_blocks_secs - self.countdown_secs
 
         self.fixed_order = fixed_order
         self.show_practice = show_practice
@@ -406,15 +412,19 @@ class SART:
                                       f" number {self.omit_number}.\n\n"
                                       "Press the b key to start the "
                                       "practice.")
+        if self.countdown:
+            practice_message += f"\n\nA countdown bar will be displayed from {self.countdown_secs} seconds before the start."
         
         self.show_message(practice_message)
 
     def show_task_start_message(self):
-        start_message = ("We will now start the actual task.\n"
+        start_message = ("We will now start the task.\n"
                                       "\nRemember, give equal importance to"
                                       " both accuracy and speed while doing"
                                       " this task.\n\nPress the b key to "
-                                      "start the actual task.")
+                                      "begin.")
+        if self.countdown:
+            start_message += f"\n\nA countdown bar will be displayed from {self.countdown_secs} seconds before the start of each block."
         
         self.show_message(start_message)
 
@@ -502,6 +512,29 @@ class SART:
         self.save_and_quit()
 
 
+    def show_countdown_bar(self, seconds:float):
+        """
+        Displays a loading bar on the screen.
+        Parameters:
+        seconds (float): The number of seconds to display the loading bar.
+        """
+
+        backgroundBar = visual.Rect(self.window, width=20, height=1, pos=(0, 0), fillColor="gray")
+        bg_bar_left = 0 - backgroundBar.width/2
+        loadingBar = visual.Rect(self.window, width=0, height=1, pos=(bg_bar_left, 0), fillColor="green", anchor="left")
+        countdown = visual.TextStim(self.window, text="", pos=(0, -2), color="white")
+        start_time = core.getTime()
+        while core.getTime() - start_time < seconds:
+            countdown.setText(f"{int(seconds - (core.getTime() - start_time))+1}")
+            progress = (core.getTime() - start_time) / seconds
+            loadingBar.width = 20 * progress
+            countdown.draw()
+            backgroundBar.draw()
+            loadingBar.draw()
+            self.window.flip()
+        self.window.flip()
+
+
     def block(self, block_number:int=0, practice:bool=False):
         """
         Executes a block of trials for the sustained attention to response task (SART).
@@ -513,7 +546,7 @@ class SART:
         Results for each trial are recorded in the results dictionary, unless practice is True.
         The method also initializes a clock to keep track of the timing for each trial.
         """
-
+        
         event.Mouse(visible=False)
         self.x_stim = visual.TextStim(self.window, text="X", height=3.35, color="white", 
                             pos=(0, 0))
@@ -523,8 +556,9 @@ class SART:
         self.correct_stim = visual.TextStim(self.window, text="CORRECT", color="green", 
                                     font="Arial", pos=(0, 0))
         self.incorrect_stim = visual.TextStim(self.window, text="INCORRECT", color="red",
-                                        font="Arial", pos=(0, 0))       
-        
+                                        font="Arial", pos=(0, 0))
+        if self.countdown:
+            self.show_countdown_bar(self.countdown_secs)
 
         trials = self.create_trial_list(practice)
         self.clock = core.Clock()
@@ -604,7 +638,7 @@ class SART:
 
         
 if __name__ == "__main__":
-    sart = SART(blocks=1, reps=1, omit_number=3, show_practice=False)
+    sart = SART(blocks=1, reps=1, omit_number=3, show_practice=False, show_countdown=True)
     sart.run()
 
 

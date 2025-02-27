@@ -51,7 +51,8 @@ function documentation below for details):
 4) The presentation order of the numbers. Specifically, the numbers can be presented randomly or in a fixed fashion. (*default is random*)
 5) Whether or not practice trials should be presented at the beginning of the task. (*default is True*)
 6) The number of seconds to wait between blocks. (*default is 60s*)
-7) The default directory in which the output file will be placed. Defaults to a subfolder named 'output' in the directory in which the task is placed.
+7) Whether or not to show a countdown in the 5 seconds befor each block.
+8) The default directory in which the output file will be placed. Defaults to a subfolder named 'output' in the directory in which the task is placed.
 
 ## Function Details
 
@@ -64,6 +65,7 @@ To run a SART experiment, create an instance of the SART class with the desired 
 - **break_between_blocks_secs** (float): The number of seconds to wait between blocks (default is 60s).
 - **stimulus_visible_secs** (float): The number of seconds the stimulus is visible (default is 0.90s).
 - **stimulus_masked_secs** (float): The number of seconds the stimulus is masked (default is 0.25s).
+- **show_countdown** (bool): If the task should display a countdown before the start of each block (default is False).
 - **output_dir** (str): The  default directory in which the save file dialog will open. If not specified, the save file dialog will open in the current working directory.
 - **fixed_order** (bool): Whether or not the numbers should be presented in a fixed instead of random order (e.g., 1, 2, 3, 4, 5, 6, 7, 8 ,9, 1, 2, 3, 4, 5, 6, 7, 8, 9,...).
 - **monitor** (str): The monitor to be used for the task. (default is "testMonitor", the PsychoPy default monitor)

@@ -23,6 +23,10 @@ blocks = 1
 # each combination of 5 font sizes and 9 numbers)
 reps = 5
 
+# Set True to enable showing a countdown with a loading bar in the 5 seconds before the start of each block
+show_countdown = True
+
+
 #The number at which the user should withhold input
 #If you set this to 'number_to_omit=None', a random number between 1 and 9 will be picked.
 #This number is recorded in the output file
@@ -36,5 +40,5 @@ practice = True
 fixed_order = False
 
 # Run the experiment
-sart = python_sart.SART(blocks=blocks, reps=reps, omit_number=number_to_omit, show_practice=practice, fixed_order=fixed_order)
+sart = python_sart.SART(blocks=blocks, reps=reps, omit_number=number_to_omit, show_practice=practice, fixed_order=fixed_order, show_countdown=show_countdown)
 sart.run()
