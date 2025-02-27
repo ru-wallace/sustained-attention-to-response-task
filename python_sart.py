@@ -164,14 +164,20 @@ def part_info_gui():
     info.addField('Gender: ', 
                   choices=["Please Select", "Male", "Female", "Other"])
     info.addField('Age:  ')
-    info.addField('Year in School: ', 
-                  choices=["Please Select", "N/A", "1st Year", "2nd Year", "3rd Year", 
-                           "4th Year", "1st Year Graduate Student",
-                           "2nd Year Graduate Student", 
-                           "3rd Year Graduate Student", 
-                           "4th Year Graduate Student",
-                           "5th Year Graduate Student", 
-                           "6th Year Graduate Student"])
+    info.addField('Year of stufy: ', 
+                  choices=["Please Select", "N/A", 
+                           "1st Year Undergraduate",
+                           "2nd Year Undergraduate",
+                           "3rd Year Undergraduate",
+                           "4th Year Undergraduate",
+                           "5th Year Undergraduate",
+                           "6th Year (or higher) Undergraduate",
+                           "1st Year Post-graduate",
+                           "2nd Year Post-graduate", 
+                           "3rd Year Post-graduate", 
+                           "4th Year Post-graduate",
+                           "5th Year Post-graduate", 
+                           "6th Year (or higher) Post-graduate"])
     info.addField('Do you have normal or corrected-to-normal vision?', 
                   choices=["Please Select", "Yes", "No"])
     info.addText('')
