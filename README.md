@@ -1,8 +1,4 @@
-# sustained-attention-to-response-task
-
-=============
-
-## SART
+# Sustained Attention to Response Task (SART)
 
 A Python version of the Sustained Attention to Response Task (SART) as detailed by Robertson et al. (1997). Requires [PsychoPy](http://www.psychopy.org/).
 
@@ -12,7 +8,7 @@ Originally created by [Cary Stothart](https://github.com/cstothart), forked by [
 
 Modified significantly from the [original version](https://github.com/cstothart/sustained-attention-to-response-task) to work with more recent releases of Python and PsychoPy. An earlier iteration much closer to the original code can be found [here](python_sart_old.py).
 
-### How to Use
+## How to Use
 
 1. Install PsychoPy if you haven't already.
 2. Download the [python_sart.py](python_sart.py) file from this repository and save it to a desired location on your computer.
@@ -28,7 +24,7 @@ Modified significantly from the [original version](https://github.com/cstothart/
    - Next time you want to run the script, double-click on the task list file to open it in PsychoPy and then click on the green "Run" button in the "Desktop" section of the toolbar at the top of the PsychoPy window.
    - If the "run" button is coloured orange, you will need to select and deselect "Pilot" mode in the "Experiment" section of the Runner view toolbar before you run the task.
 
-#### Note for manual PsychoPy installation using pip or conda (Ignore if using the standalone PsychoPy application)
+### Note for manual PsychoPy installation using pip or conda (Ignore if using the standalone PsychoPy application)
 
 The max NumPy version that PsychoPy supports is 1.23.5. If you are installing PsychoPy manually using pip or conda, you may need to manually install an older version of NumPy. You can install the correct version of NumPy using the following command:
 
@@ -48,7 +44,7 @@ For optimal performance of the GUI, install PyQt5 using the following command:
 pip install pyqt5
 ```
 
-### Task Details
+## Task Details
 
 The following task attributes can be easily modified (see the sart()
 function documentation below for details):
@@ -61,8 +57,7 @@ function documentation below for details):
 5) Whether or not practice trials should be presented at the beginning of the task.
 6) The default directory in which the output file will be placed. Defaults to a subfolder named 'output' in the directory in which the task is placed.
 
-
-### Function Details
+## Function Details
 
 To run a SART experiment, create an instance of the SART class with the desired parameters and call the run() method. The SART class has the following parameters:
 
@@ -90,12 +85,12 @@ sart.run()
 The run() method will open a dialogue to enter the participant details, then prompt you to select a directory to save the output file.
 Once these details are entered, the task will begin.
 
-### Reference
+## Reference
 
 Robertson, H., Manly, T., Andrade, J.,  Baddeley, B. T., & Yiend, J. (1997).
 'Oops!': Performance correlates of everyday attentional failures in traumatic brain injured and normal subjects. Neuropsychologia, 35(6), 747-758.
 
-### Fork Notes
+## Fork Notes
 
 I forked this repository to make a few changes to the original code. I updated some of the code to work with more recent releases of Python and PsychoPy. I also added a few more parameters to allow for more customization of the task.
 
