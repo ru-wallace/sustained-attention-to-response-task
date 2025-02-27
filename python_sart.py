@@ -164,7 +164,7 @@ def part_info_gui():
     info.addField('Gender: ', 
                   choices=["Please Select", "Male", "Female", "Other"])
     info.addField('Age:  ')
-    info.addField('Year of stufy: ', 
+    info.addField('Year of study: ', 
                   choices=["Please Select", "N/A", 
                            "1st Year Undergraduate",
                            "2nd Year Undergraduate",
