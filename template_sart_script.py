@@ -12,7 +12,7 @@ See the instructions at https://github.com/ru-wallace/sustained-attention-to-res
 
 
 
-import python_sart_1
+import python_sart
 
 ### Define the parameters for the experiment
 
@@ -36,5 +36,4 @@ practice = True
 fixed_order = False
 
 # Run the experiment
-#python_sart.sart(blocks=blocks, reps=reps, path=path, practice=practice, fixed=fixed, selectOutputFile=selectOutputFile, format=format, delimiter=delimiter)
-sart = python_sart_1.SART(blocks=blocks, reps=reps, omit_number=number_to_omit, show_practice=practice, fixed_order=fixed_order)
+sart = python_sart.SART(blocks=blocks, reps=reps, omit_number=number_to_omit, show_practice=practice, fixed_order=fixed_order)
